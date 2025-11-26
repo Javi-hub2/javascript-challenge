@@ -1,0 +1,226 @@
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu and Order</title>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            gap: 30px;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu, .order {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .menu h2, .order h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #007BFF;
+            text-align: center;
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        .menu-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .menu-item:nth-child(even) {
+            background-color: #f7f7f7;
+        }
+
+        .menu-item input[type="number"] {
+            width: 60px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px;
+            font-size: 1rem;
+        }
+
+        .menu-item span {
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .menu button {
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 20px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .menu button:hover {
+            background-color: #0056b3;
+        }
+
+        .order div {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .order div:last-child {
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="menu">
+            <h2>Menulijst</h2>
+            <div class="menu-item">
+                <span>water</span>
+                <input type="number" value="0">
+                <span>€ 1,50</span>
+            </div>
+            <div class="menu-item">
+                <span>cola</span>
+                <input type="number" value="0">
+                <span>€ 2,25</span>
+            </div>
+            <div class="menu-item">
+                <span>broodjeKaas</span>
+                <input type="number" value="0">
+                <span>€ 3,50</span>
+            </div>
+            <div class="menu-item">
+                <span>Hamburger</span>
+                <input type="number" value="0">
+                <span>€ 4,75</span>
+            </div>
+            <button>Opnieuw</button>
+        </div>
+        <div class="order">
+            <h2>Bestelling</h2>
+        </div>
+    </div>
+ 
+    <script>
+       document.addEventListener("DOMContentLoaded", function () {
+    // Selecteer alle menu-items, de bestelling-sectie en de reset-knop
+    const menuItems = document.querySelectorAll(".menu-item");
+    const orderSection = document.querySelector(".order");
+    const resetButton = document.querySelector(".menu button");
+
+    // Object om de bestelling bij te houden
+    let order = {};
+   
+    // Functie om de bestelling bij te werken
+    function updateOrder() {
+        // Reset de inhoud van de bestelling-sectie
+        orderSection.innerHTML = "<h2>Bestelling</h2>";
+
+        let total = 0;
+
+        // Verwijder items uit de bestelling die een hoeveelheid van 0 hebben
+        for (const item in order) {
+            if (order[item] === 0) {
+                delete order[item];
+            }
+        }
+
+        // Voeg elk item in de bestelling toe aan de bestelling-sectie
+        for (const item in order) {
+            const price = parseFloat(item.split("€")[1].replace(",", "."));
+            const quantity = order[item];
+
+            // Maak een nieuw element voor het item in de bestelling
+            const orderItem = document.createElement("div");
+            orderItem.textContent = `${item} x ${quantity} = € ${(quantity * price).toFixed(2)}`;
+            orderSection.appendChild(orderItem);
+
+            // Bereken het totaalbedrag
+            total += quantity * price;
+        }
+
+        // Voeg het totaalbedrag toe aan de bestelling-sectie
+        if (total > 0) {
+            const totalElement = document.createElement("div");
+            totalElement.textContent = `Totaal: € ${total.toFixed(2)}`;
+            totalElement.style.fontWeight = "bold";
+            orderSection.appendChild(totalElement);
+        }
+    }
+
+    // Voeg event listeners toe aan elk menu-item
+    menuItems.forEach((item) => {
+        const quantityInput = item.querySelector("input[type='number']"); // Inputveld voor hoeveelheid
+        const itemName = item.querySelector("span").textContent; // Naam van het item
+        const price = parseFloat(item.querySelector("span:last-child").textContent.replace("€ ", "").replace(",", "."));
+
+        // Event listener voor het bijwerken van de hoeveelheid
+        quantityInput.addEventListener("input", function () {
+            let quantity = parseInt(quantityInput.value);
+
+            // Controleer of de ingevoerde waarde geldig is
+            if (isNaN(quantity) || quantity < 0) {
+                quantity = 0;
+                quantityInput.value = 0;
+            } else {
+                quantityInput.value = quantity;
+            }
+
+            // Voeg het item toe aan de bestelling of werk het bij
+            const itemKey = `${itemName} € ${price}`;
+            order[itemKey] = quantity;
+
+            // Werk de bestelling bij
+            updateOrder();
+        });
+    });
+
+    // Event listener voor de reset-knop
+    resetButton.addEventListener("click", function () {
+        // Reset alle hoeveelheden naar 0
+        menuItems.forEach((item) => {
+            item.querySelector("input[type='number']").value = 0;
+        });
+        order = {}; // Leeg de bestelling
+        updateOrder(); // Werk de bestelling bij
+    });
+
+    // Initialiseer de bestelling bij het laden van de pagina
+    updateOrder();
+});
+    </script>
+</body>
+</html>
